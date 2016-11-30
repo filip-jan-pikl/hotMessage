@@ -1,6 +1,6 @@
 <div style="display:none;" id="myDiv" class="animate-bottom">
     <?php            
-        $adminEmail = "geze.cz@geze.com";   
+        $adminEmail = "admin@example.com";   
 
         function output_err($num) {
             $err[1] = 'Jak se jmenujete?';
@@ -26,7 +26,7 @@
             $strictDate = Date("j/m/Y H:i:s", Time());
             $date = Date("j/m/Y", Time());
 
-            $webName = "gezedata.cz";
+            $webName = "yourwebexample.com";
 
             $name =  substr(htmlspecialchars(trim($values->name)), 0, 50);
             $email =  substr(htmlspecialchars(trim($values->email)), 0, 50);
