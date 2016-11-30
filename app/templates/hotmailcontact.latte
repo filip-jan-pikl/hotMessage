@@ -1,0 +1,346 @@
+<!-- Pro aplikaci v nette i mimo něj -->
+<!-- Vyžaduje: twitter bootstrap 3, jquery -->
+<!-- Implementace zabere 20 min. -->
+
+<style>
+    /* The Modal (background) */
+    .modalHotMessage {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 999; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modalHotMessage-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 0;
+        border: 1px solid #888;
+        width: 80%;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        -webkit-animation-name: animatetop;
+        -webkit-animation-duration: 0.4s;
+        animation-name: animatetop;
+        animation-duration: 0.4s;
+        border-radius: 20px;
+    }
+
+    /* Add Animation */
+    @-webkit-keyframes animatetop {
+        from { top:-300px; opacity:0 } 
+        to { top:0; opacity:1 }
+    }
+
+    @keyframes animatetop {
+        from { top:-300px; opacity:0 }
+        to { top:0; opacity:1 }
+    }
+
+    /* The Close Button */
+    .myclose {
+        color: white;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        margin-top:10px;
+    }
+
+    .myclose:hover,
+    .myclose:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modalHotMessage-header {
+        padding: 2px 16px;
+        background-color: orange;
+        color: white;
+        border-radius: 20px 20px 0px 0px;
+    }
+
+    .modalHotMessage-body { padding: 20px 20px; }
+
+    .modalHotMessage-footer {
+        padding: 10px 16px;
+        text-align: center;
+        background-color: orange;
+        color: white;
+        border-radius: 0px 0px 20px 20px;
+    }
+
+    .hotMailContactBtn {
+        position:fixed;
+        z-index: 9999;
+        bottom:100px;
+        right:0px;
+        padding:15px;
+        border-radius: 10px 0px 0px 10px;
+        border: 3px solid white;
+        border-right: 0px;
+        background: orange;
+        text-align:center;
+    }
+    
+    .btnSendModal {
+        background: darkblue;
+        border:3px solid orange;
+    }
+    .btnSendModal:hover {
+        background: orange;
+        border:3px solid darkblue;
+    }
+
+    .errorInput {
+        font-weight: bold;
+        padding: 10px;
+        color: red;
+        margin:5px;
+        display: block;
+    }
+    
+    #loader {
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid orange;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+        display: block;
+        margin: 0 auto;
+      }
+
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Add animation to "page content" */
+      .animate-bottom {
+        position: relative;
+        -webkit-animation-name: animatebottom;
+        -webkit-animation-duration: 1s;
+        animation-name: animatebottom;
+        animation-duration: 1s
+      }
+
+      @-webkit-keyframes animatebottom {
+        from { bottom:-100px; opacity:0 } 
+        to { bottom:0px; opacity:1 }
+      }
+
+      @keyframes animatebottom { 
+        from{ bottom:-100px; opacity:0 } 
+        to{ bottom:0; opacity:1 }
+      }
+
+      #myDiv {
+        display: none;
+        text-align: center;
+        }
+</style>
+    
+<button id="myBtn" type="button" class="hotMailContactBtn">
+  <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+  <br>
+   Máte dotaz?
+</button>
+
+<!-- The Modal -->
+<div id="hotMessageModal" class="modalHotMessage">
+
+    <!-- Modal content -->
+    <div class="modalHotMessage-content">
+        <div class="modalHotMessage-header">
+            <span class="myclose">×</span>
+            <h2>Rychlý kontakt</h2>
+        </div>
+
+        <div id="modalContent">
+            <div class="modalHotMessage-body">
+                <div id="modalContentAjaxStatic" style="display:block">
+                    <form action="?values" method="post" id="contactForm" class="form-horizontal" name="contactForm">
+
+                        <div class="form-group">
+                            <div class="col-sm-12 col-sm-offset-0">
+                                Zde můžete vyplnit kontaktní údaje a nastínit, co chcete řešit. My se Vám brzy ozveme.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="control-label col-sm-2">Jméno <span class="required">*</span></label>
+                            <div class="col-sm-9 col-sm-offset-0">
+                                <input type="text" class="form-control" value="<?php if(isset($_POST['name'])) echo $_POST['name'];?>" size="35" id="name" name="name">
+                                <span class="errorInput" id="missingName" style="display:none;">Jak se jmenujete?</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="control-label col-sm-2">Telefon <span class="required">*</span></label>
+                            <div class="col-sm-9 col-sm-offset-0">
+                                <input type="text" class="form-control" value="<?php if(isset($_POST['phone'])) echo $_POST['phone'];?>" size="35" id="phone" name="phone">
+                                <span class="errorInput" id="missingPhone" style="display:none;">Jaký je Váš teleon?</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="control-label col-sm-2">Email <span class="required">*</span></label>
+                            <div class="col-sm-9 col-sm-offset-0">
+                                <input type="text" class="form-control" value="<?php if(isset($_POST['email'])) echo $_POST['email'];?>" size="35" id="email" name="email">
+                                <span class="errorInput" id="missingEmail" style="display:none;">Jaký je Váš email?</span>
+                                <span class="errorInput" id="invalidEmail" style="display:none;">Email není ve správném tvaru.</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="control-label col-sm-2">Zpráva</label>
+                            <div class="col-sm-9 col-sm-offset-0">
+                                <textarea class="form-control" id="message" name="message" cols="7" rows="6"><?php if(isset($_POST['message'])) echo $_POST['message'];?></textarea>
+                                <span class="errorInput name"></span>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div id="modalContentAjaxDynamic" style="display:none">
+                    <div id="loader"></div>
+                </div>
+            </div>
+            <div class="modalHotMessage-footer">
+                <span class="btn btn-primary btn-lg btnSendModal" id="btnHotMessage" onclick="sendHotMessage()">
+                    Odeslat
+                </span>
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+<script>        
+    // Get the modal
+    var modal = document.getElementById('hotMessageModal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("myclose")[0];
+
+    // When the user clicks the button, open the modal 
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    function backToForm(status) {
+        if (status == 0) {
+            document.getElementById('phone').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('message').value = '';
+            document.getElementById("modalContentAjaxDynamic").innerHTML = '<div id="loader"></div>';
+        }
+        
+        document.getElementById("modalContentAjaxDynamic").style.display = "none";
+        document.getElementById("modalContentAjaxStatic").style.display = "block";
+        document.getElementById("btnHotMessage").style.visibility = "visible";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Run if hash contains name of modal
+    var hash = location.hash.substr(1);
+    if (hash === "hotMessageModal") {
+        modal.style.display = "block";
+    }
+
+    function isEmpty(str) {
+        return (!str || 0 === str.length);
+    }
+
+    function sendHotMessage() {
+        var btnSendHotMessage = document.getElementById("btnHotMessage");
+        var name = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var phone = document.getElementById("phone").value;
+        var message = document.getElementById("message").value;
+        var valid = 0;
+        if (isEmpty(name)) {
+            document.getElementById("missingName").style.display = "block";
+        } else {
+            document.getElementById("missingName").style.display = "none";
+            valid = valid + 1;
+        }
+        if (isEmpty(phone)) {
+            document.getElementById("missingPhone").style.display = "block";
+        } else {
+            document.getElementById("missingPhone").style.display = "none";
+            valid = valid + 1;
+        }
+        if (isEmpty(email)) {
+            document.getElementById("missingEmail").style.display = "block";
+        } else {
+            document.getElementById("missingEmail").style.display = "none";
+            valid = valid + 1;
+        }
+
+        if (valid == 3) {
+            document.getElementById("modalContentAjaxStatic").style.display = "none";
+            document.getElementById("btnHotMessage").style.visibility = "hidden";
+            document.getElementById("modalContentAjaxDynamic").style.display = "block";
+
+            //var xmlhttp = new XMLHttpRequest();
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            } else {
+                // code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("modalContentAjaxDynamic").innerHTML = this.responseText;
+                    eval(loaderReady());
+                }
+            };
+            message = document.getElementById('message').value;
+            message = encodeURIComponent(message);
+            xmlhttp.open("POST", "sendhotmessage.php?name=" + name + "&email=" + email + "&phone=" + phone + "&message=" + message, true);
+            xmlhttp.send();
+        }
+    }
+    
+    function loaderReady() {
+        if (document.getElementById("loader") != null) {
+            document.getElementById("loader").style.display = "none";
+        }      
+        document.getElementById("myDiv").style.display = "block";
+    }
+</script>
