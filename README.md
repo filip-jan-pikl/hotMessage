@@ -1,5 +1,5 @@
 # hotMessage
-Simple component for sending feedback, user questions etc.
+Simple ajax component for sending feedback, user questions etc.
 
 You can place it on the side of web page, after click you will see modal box.
 
